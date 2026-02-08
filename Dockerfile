@@ -21,6 +21,7 @@ COPY src src
 # Build jar
 RUN ./gradlew bootJar --no-daemon -x test
 
+
 # =========================
 # Run stage
 # =========================
