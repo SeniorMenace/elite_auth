@@ -14,4 +14,5 @@ public class VerifyEmailResponse {
     public void setRefresh_token(String refresh_token) { this.refresh_token = refresh_token; }
     public String getNextStep() { return nextStep; }
     public void setNextStep(String nextStep) { this.nextStep = nextStep; }
+
 }
