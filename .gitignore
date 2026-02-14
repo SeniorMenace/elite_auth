@@ -35,3 +35,15 @@ out/
 
 ### VS Code ###
 .vscode/
+
+# Env
+.env
+
+# Logs
+*.log
+
+# Test reports
+/build/reports/
+
+# Misc
+*.class
