@@ -31,14 +31,16 @@ public class AuthService {
     private final JwtUtil jwtUtil;
     private final OtpService otpService;
     private final EmailService emailService;
+    private final TelegramOtpService telegramOtpService;
 
     private static final String ROLE_USER = "ROLE_USER";
     private static final String NEXT_STEP_VERIFY = "verify_email";
     private static final String NEXT_STEP_ONBOARDING = "onboarding";
 
     public AuthService(UserRepository userRepository, RefreshTokenRepository refreshTokenRepository,
-                       SubscriptionRepository subscriptionRepository, PasswordEncoder passwordEncoder,
-                       JwtUtil jwtUtil, OtpService otpService, EmailService emailService) {
+            SubscriptionRepository subscriptionRepository, PasswordEncoder passwordEncoder,
+            JwtUtil jwtUtil, OtpService otpService, EmailService emailService,
+            TelegramOtpService telegramOtpService) {
         this.userRepository = userRepository;
         this.refreshTokenRepository = refreshTokenRepository;
         this.subscriptionRepository = subscriptionRepository;
@@ -46,6 +48,7 @@ public class AuthService {
         this.jwtUtil = jwtUtil;
         this.otpService = otpService;
         this.emailService = emailService;
+        this.telegramOtpService = telegramOtpService;
     }
 
     @Transactional
@@ -65,12 +68,19 @@ public class AuthService {
         user.setActive(false);
         user.setRegistrationStep(0);
         user.setRoles(java.util.Set.of(ROLE_USER));
+        if (request.getTelegramId() != null && !request.getTelegramId().isBlank()) {
+            user.setTelegramId(request.getTelegramId());
+        }
         user = userRepository.save(user);
         String otp = otpService.generateAndStore(user.getEmail());
-        emailService.sendOtpEmail(user.getEmail(), otp);
+        if (user.getTelegramId() != null && !user.getTelegramId().isBlank()) {
+            telegramOtpService.sendOtpTelegram(user.getTelegramId(), otp);
+        } else {
+            emailService.sendOtpEmail(user.getEmail(), otp);
+        }
         String onboardingToken = jwtUtil.generateOnboardingToken(user.getId(), user.getEmail());
         SignupResponse resp = new SignupResponse();
-        resp.setMessage("Verification code sent to your email");
+        resp.setMessage("Verification code sent to your email or Telegram");
         resp.setOnboarding_token(onboardingToken);
         resp.setUserId(user.getId());
         resp.setNextStep(NEXT_STEP_VERIFY);

@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS users (
     city VARCHAR(100),
     country VARCHAR(100),
     character_traits VARCHAR(1000),
+    telegram_id VARCHAR(64),
     created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP NOT NULL
 );
