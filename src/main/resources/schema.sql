@@ -1,4 +1,10 @@
--- PostgreSQL schema for eliteback
+-- 1. Find the constraint name (if you don't know it, use \d refresh_tokens in psql)
+ALTER TABLE refresh_tokens DROP CONSTRAINT fk1lih5y2npsf8u5o3vhdb9y0os;
+
+-- 2. Add the correct constraint
+ALTER TABLE refresh_tokens
+ADD CONSTRAINT fk_refresh_tokens_user_id
+FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE;-- PostgreSQL schema for eliteback
 
 CREATE TABLE IF NOT EXISTS users (
     id BIGSERIAL PRIMARY KEY,
